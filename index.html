@@ -1,1 +1,794 @@
-terserah
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PROCEDURE TEXT RACING CHALLENGE</title>
+<style>
+  /* Reset & Basic */
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #0088cc, #00cc88);
+    color: #fff;
+    overflow-x: hidden;
+  }
+  h1,h2,h3,p,button,label { margin:0; padding:0; }
+  button {
+    padding: 12px 24px;
+    border:none;
+    background: #0099ff;
+    color:#fff;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  button:hover { background: #0077cc; }
+  .hidden { display:none !important; }
+  /* Container */
+  .container {
+    max-width: 900px;
+    margin: auto;
+    padding: 15px;
+  }
+  /* Heading */
+  header {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-size:2rem; 
+    text-shadow: 2px 2px 8px #004466;
+  }
+  header p {
+    font-size:1.1rem;
+    font-weight: 600;
+  }
+  /* Buttons Row */
+  .flex-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  /* Race Track */
+  #race-track {
+    position: relative;
+    background:#004455;
+    border-radius: 20px;
+    height: 120px;
+    margin: 20px auto;
+    max-width: 900px;
+    box-shadow: 0 0 15px #00ffaa;
+    overflow: hidden;
+  }
+  .start-line, .finish-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    background: repeating-linear-gradient(
+      45deg,
+      #fff,
+      #fff 10px,
+      #000 10px,
+      #000 20px
+    );
+  }
+  .start-line { left: 0; }
+  .finish-line { right: 0; }
+  /* Cars */
+  .car {
+    position: absolute;
+    bottom: 8px;
+    width: 80px;
+    height: 50px;
+    background: red;
+    border-radius: 10px 10px 5px 5px;
+    box-shadow: 0 10px 5px rgba(0,0,0,0.3);
+    transition: left 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  /* Color variants */
+  .car.red { background: #e63946; }
+  .car.blue { background: #457b9d; }
+  .car.green { background: #2a9d8f; }
+  .car.yellow { background: #e9c46a; color:#000; }
+  .car.purple { background: #7f5af0; }
+  /* Wheels */
+  .wheel {
+    position: absolute;
+    bottom: 2px;
+    width: 15px;
+    height: 15px;
+    background: #222;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #000 inset;
+    border: 2px solid #555;
+  }
+  .wheel.front {
+    right: 10px;
+  }
+  .wheel.rear {
+    left: 10px;
+  }
+  /* Player Info Panel */
+  #player-info {
+    margin: 15px 0;
+    font-size: 1.1rem;
+    text-align: center;
+  }
+  /* Question Panel */
+  #question-panel {
+    background: rgba(0,0,0,0.35);
+    border-radius: 12px;
+    padding: 18px;
+    max-width: 900px;
+    margin: 20px auto;
+  }
+  #question-text {
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+  }
+  #answers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  #answers-list button {
+    background: #0077cc;
+    font-size: 1rem;
+    text-align: left;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  #answers-list button:hover {
+    background: #005fa3;
+  }
+  #answers-list button.correct {
+    background: #28a745 !important;
+    border-color: #1e7e34;
+  }
+  #answers-list button.wrong {
+    background: #dc3545 !important;
+    border-color: #b02a37;
+    color: #fff;
+  }
+  /* Timer */
+  #timer {
+    font-size: 1.15rem;
+    font-weight: 700;
+    text-align: right;
+    margin-bottom: 6px;
+  }
+  /* Progress Bar */
+  #progress-bar-container {
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 20px;
+    max-width: 900px;
+    margin: 12px auto 20px;
+  }
+  #progress-bar {
+    height: 100%;
+    background: #0099ff;
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  /* Result */
+  #result-panel {
+    background: rgba(0,0,0,0.7);
+    border-radius: 15px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 40px auto;
+    text-align: center;
+    box-shadow: 0 0 20px #00ffaa;
+  }
+  #result-panel h2 {
+    font-size: 2rem;
+    margin-bottom: 12px;
+  }
+  #result-panel p {
+    font-size: 1.1rem;
+    margin: 8px 0;
+  }
+  /* Inputs */
+  input[type=text], select {
+    width: 100%;
+    font-size: 1rem;
+    padding: 8px;
+    border-radius: 6px;
+    border: 2px solid #0099ff;
+    margin-bottom: 14px;
+  }
+  label {
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: block;
+  }
+  /* Start screen & join race */
+  #start-screen, #join-screen, #teacher-mode-screen {
+    max-width: 600px;
+    margin: 50px auto;
+    background: rgba(0,0,0,0.6);
+    border-radius: 18px;
+    padding: 30px 25px;
+    box-shadow: 0 0 22px #00ffcc;
+    user-select: none;
+  }
+  #start-screen img {
+    max-width: 100%;
+    margin: 18px 0;
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    #race-track {
+      height: 100px;
+    }
+    .car {
+      width: 60px;
+      height: 38px;
+      bottom: 6px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- Start Screen -->
+<div id="start-screen">
+  <header>
+    <h1>PROCEDURE TEXT RACING CHALLENGE</h1>
+    <p><strong>Read It – Understand It – Answer It – Race to Victory!</strong></p>
+  </header>
+  <img src="https://i.ibb.co/y6gTRST/race-track-illustration.png" alt="Race Track & Cars Illustration" />
+  <p style="text-align:center; font-size:1.2rem; font-weight:600;">Subject: English<br />Material: Procedure Text<br />Level: Senior High School</p>
+  <div class="flex-buttons" style="justify-content:center;">
+    <button id="btn-start">START RACE</button>
+    <button id="btn-howto">HOW TO PLAY</button>
+    <button id="btn-teachermode">TEACHER MODE</button>
+  </div>
+</div>
+
+<!-- How to play modal -->
+<div id="howto-modal" class="hidden" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);color:#fff;overflow:auto;padding: 30px 15px;z-index:9999;">
+  <h2 style="text-align:center; margin-bottom: 20px;">How to Play</h2>
+  <p>Welcome to the Procedure Text Racing Challenge! Your goal is to answer English procedure text questions correctly to move your car along the race track and win the race.</p>
+  <ul>
+    <li>Start by entering your name, selecting your class, car, and car color.</li>
+    <li>You will receive a question with multiple choice answers.</li>
+    <li>Answer correctly to move your car forward along the track.</li>
+    <li>Three correct answers in a row give you a NITRO BOOST for extra speed.</li>
+    <li>Answer fast to get TIME BONUS points.</li>
+    <li>HOTS questions give DOUBLE POINTS!</li>
+    <li>Beware of challenges in PIT STOP and FINAL LAP.</li>
+    <li>Race until all questions are answered or time runs out.</li>
+    <li>Have fun and race to victory!</li>
+  </ul>
+  <button id="close-howto" style="display:block; margin: 20px auto;">Close</button>
+</div>
+
+<!-- Join Race Screen -->
+<div id="join-screen" class="hidden">
+  <h2 style="text-align:center; margin-bottom: 20px;">Join The Race</h2>
+  <label for="player-name">Full Name:</label>
+  <input type="text" id="player-name" autocomplete="off" placeholder="Your full name" required />
+  <label for="player-class">Class:</label>
+  <select id="player-class" required>
+    <option value="" disabled selected>Select Class</option>
+    <option value="10A">10A</option>
+    <option value="10B">10B</option>
+    <option value="11A">11A</option>
+    <option value="11B">11B</option>
+    <option value="12A">12A</option>
+    <option value="12B">12B</option>
+  </select>
+  <label for="player-car">Choose Your Car:</label>
+  <select id="player-car" required>
+    <option value="" disabled selected>Select Car Model</option>
+    <option value="red">Red Falcon</option>
+    <option value="blue">Blue Lightning</option>
+    <option value="green">Green Hornet</option>
+    <option value="yellow">Yellow Comet</option>
+    <option value="purple">Purple Phantom</option>
+  </select>
+  <label for="race-mode">Race Mode:</label>
+  <select id="race-mode" required>
+    <option value="" disabled selected>Select Race Mode</option>
+    <option value="solo">Solo Race</option>
+    <option value="team">Team Race</option>
+  </select>
+  <button id="btn-join" style="margin-top: 20px;">JOIN THE RACE</button>
+</div>
+
+<!-- Race Track & Game Area -->
+<div id="game-area" class="hidden">
+  <div id="player-info"></div>
+  <div id="race-track" aria-label="Race Track">
+    <div class="start-line" aria-label="Start Line"></div>
+    <div class="finish-line" aria-label="Finish Line"></div>
+    <div id="player-car" class="car red" style="left:0;">
+      <div class="wheel front"></div>
+      <div class="wheel rear"></div>
+    </div>
+  </div>
+  <div id="progress-bar-container" aria-label="Progress Bar">
+    <div id="progress-bar"></div>
+  </div>
+  <div id="timer" aria-live="polite" aria-atomic="true">Time left: 30s</div>
+  <div id="question-panel" aria-live="polite" aria-atomic="true">
+    <div id="question-text">Question text will appear here</div>
+    <div id="answers-list">
+      <!-- Answer buttons inserted by JS-->
+    </div>
+  </div>
+</div>
+
+<!-- Result Panel -->
+<div id="result-panel" class="hidden" role="alert" aria-live="assertive" aria-atomic="true"></div>
+
+<!-- Teacher Mode Screen -->
+<div id="teacher-mode-screen" class="hidden">
+  <h2 style="text-align:center; margin-bottom: 20px;">Teacher Mode</h2>
+  <p><em>(Feature under construction)</em></p>
+  <button id="btn-back-to-start">Back to Start</button>
+</div>
+
+</div>
+
+<script>
+(() => {
+  // DATA: Questions array separated for ease of teaching
+  // Each question: id, question text, choices (A-E), correct index (0-4), explanation, difficulty (easy/medium/hard), HOTS (true/false)
+  const QUESTIONS = [
+    // Example based on "How to Make Fried Rice"
+    {
+      id: 1,
+      text: 'What is the social function of a Procedure Text?',
+      choices: [
+        'To entertain readers',
+        'To describe things',
+        'To give instructions or directions',
+        'To tell a story',
+        'To argue a point of view'
+      ],
+      correct: 2,
+      explanation: 'Procedure text is used to give instructions or explain how to do something.',
+      difficulty: 'easy',
+      hots: false
+    },
+    {
+      id: 2,
+      text: 'Which part of a procedure text usually tells the goal?',
+      choices: [
+        'Title',
+        'Goal/aim section',
+        'Steps',
+        'Materials',
+        'Conclusion'
+      ],
+      correct: 1,
+      explanation: 'The goal part states the purpose or aim of the procedure.',
+      difficulty: 'easy',
+      hots: false
+    },
+    {
+      id: 3,
+      text: 'Which sentence below uses an imperative verb correctly?',
+      choices: [
+        'You boiled the water.',
+        'Boil the water.',
+        'The water was boiled by you.',
+        'Water boiling is done.',
+        'You will boil water.'
+      ],
+      correct: 1,
+      explanation: 'Imperative sentences give commands e.g. "Boil the water."',
+      difficulty: 'easy',
+      hots: false
+    },
+    {
+      id: 4,
+      text: `Read the steps below:
+1. Heat the oil in a pan.
+2. Add garlic and fry until fragrant.
+3. Add the rice and stir well.
+Which step should come first?`,
+      choices: [
+        'Add rice first',
+        'Add garlic first',
+        'Heat oil first',
+        'Fry rice first',
+        'Wait until the end'
+      ],
+      correct: 2,
+      explanation: 'Heating the oil is the first step before adding other ingredients.',
+      difficulty: 'medium',
+      hots: true
+    },
+    {
+      id: 5,
+      text: 'What is the function of sequencing conjunctions in procedure text?',
+      choices: [
+        'To explain reasons',
+        'To connect steps in order',
+        'To describe materials',
+        'To summarize the text',
+        'To introduce characters'
+      ],
+      correct: 1,
+      explanation: 'Sequencing conjunctions such as "then", "after that" show the order of steps.',
+      difficulty: 'medium',
+      hots: true
+    },
+    // More questions will be added here for full 25
+  ];
+
+  // State variables
+  let player = { name:'', class:'', car:'red', raceMode:'solo' };
+  let currentQuestionIndex = 0;
+  let correctCount = 0;
+  let wrongCount = 0;
+  let consecutiveCorrect = 0;
+  let nitroAvailable = false;
+  let timerInterval;
+  let timeLeft = 30;
+  let raceDistance = 800; // px max distance car moves before finish
+  let carElement;
+  let progressBar;
+  let gameStarted = false;
+  let startTime;
+  let totalQuestions = QUESTIONS.length;
+
+  // UI Elements
+  const startScreen = document.getElementById('start-screen');
+  const joinScreen = document.getElementById('join-screen');
+  const gameArea = document.getElementById('game-area');
+  const resultPanel = document.getElementById('result-panel');
+  const playerInfoEl = document.getElementById('player-info');
+  const questionTextEl = document.getElementById('question-text');
+  const answersListEl = document.getElementById('answers-list');
+  const timerEl = document.getElementById('timer');
+  const progressBarContainer = document.getElementById('progress-bar');
+  const playerCarEl = document.getElementById('player-car');
+
+  // Buttons
+  const btnStart = document.getElementById('btn-start');
+  const btnHowTo = document.getElementById('btn-howto');
+  const btnCloseHowTo = document.getElementById('close-howto');
+  const btnTeacherMode = document.getElementById('btn-teachermode');
+  const btnJoin = document.getElementById('btn-join');
+  const teacherModeScreen = document.getElementById('teacher-mode-screen');
+  const btnBackStart = document.getElementById('btn-back-to-start');
+  const howtoModal = document.getElementById('howto-modal');
+
+  // Sounds (Simple beep tones)
+  const correctSound = new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
+  const wrongSound = new Audio('https://actions.google.com/sounds/v1/cartoon/boing.ogg');
+
+  // Music toggle (disabled by default)
+  let bgMusic;
+  let musicPlaying = false;
+
+  // UTILS
+  function shuffleArray(array) {
+    for(let i = array.length-1; i>0; i--) {
+      const j = Math.floor(Math.random() * (i+1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+  }
+
+  // INIT
+  function init() {
+    // Show start, hide others
+    startScreen.classList.remove('hidden');
+    joinScreen.classList.add('hidden');
+    gameArea.classList.add('hidden');
+    resultPanel.classList.add('hidden');
+    teacherModeScreen.classList.add('hidden');
+    howtoModal.classList.add('hidden');
+    gameStarted = false;
+
+    // Reset state
+    player = {name:'', class:'', car:'red', raceMode:'solo'};
+    currentQuestionIndex = 0;
+    correctCount = 0;
+    wrongCount = 0;
+    consecutiveCorrect = 0;
+    nitroAvailable = false;
+    timeLeft = 30;
+    progressBarContainer.style.width = '0%';
+    playerCarEl.style.left = '0px';
+    playerCarEl.className = 'car red';
+
+    // Clear question
+    questionTextEl.textContent = '';
+    answersListEl.innerHTML = '';
+    timerEl.textContent = 'Time left: 30s';
+    playerInfoEl.textContent = '';
+  }
+
+  // Screen changes
+  btnStart.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    joinScreen.classList.remove('hidden');
+  });
+  btnHowTo.addEventListener('click', () => {
+    howtoModal.classList.remove('hidden');
+  });
+  btnCloseHowTo.addEventListener('click', () => {
+    howtoModal.classList.add('hidden');
+  });
+  btnTeacherMode.addEventListener('click', () => {
+    startScreen.classList.add('hidden');
+    teacherModeScreen.classList.remove('hidden');
+  });
+  btnBackStart.addEventListener('click', () => {
+    teacherModeScreen.classList.add('hidden');
+    startScreen.classList.remove('hidden');
+  });
+
+  // JOIN RACE BUTTON
+  btnJoin.addEventListener('click', () => {
+    const name = document.getElementById('player-name').value.trim();
+    const cls = document.getElementById('player-class').value;
+    const car = document.getElementById('player-car').value;
+    const raceMode = document.getElementById('race-mode').value;
+
+    if(!name || !cls || !car || !raceMode) {
+      alert('Please fill in all fields to join the race.');
+      return;
+    }
+
+    player.name = name;
+    player.class = cls;
+    player.car = car;
+    player.raceMode = raceMode;
+
+    joinScreen.classList.add('hidden');
+    setupGame();
+  });
+
+  // Setup game area for player
+  function setupGame() {
+    gameArea.classList.remove('hidden');
+    playerCarEl.className = `car ${player.car}`;
+
+    updatePlayerInfo();
+    startGame();
+  }
+
+  // Update player info panel
+  function updatePlayerInfo() {
+    playerInfoEl.textContent = `Player: ${player.name} | Class: ${player.class} | Mode: ${player.raceMode}`;
+  }
+
+  // Start game logic
+  function startGame() {
+    gameStarted = true;
+    startTime = Date.now();
+
+    // Shuffle questions for fairness
+    shuffleArray(QUESTIONS);
+
+    currentQuestionIndex = 0;
+    correctCount = 0;
+    wrongCount = 0;
+    consecutiveCorrect = 0;
+    nitroAvailable = false;
+
+    // Show first question
+    showQuestion();
+
+    // Start timer 
+    resetTimer();
+  }
+
+  // Reset and start 30s countdown timer for each question
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 30;
+    timerEl.textContent = `Time left: ${timeLeft}s`;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      timerEl.textContent = `Time left: ${timeLeft}s`;
+      if(timeLeft <= 0) {
+        clearInterval(timerInterval);
+        handleAnswer(null); // Time out = no answer given
+      }
+    }, 1000);
+  }
+
+  // Show question + choices
+  function showQuestion() {
+    if(currentQuestionIndex >= QUESTIONS.length) {
+      endGame();
+      return;
+    }
+    const q = QUESTIONS[currentQuestionIndex];
+    questionTextEl.textContent = `Q${currentQuestionIndex+1}. ${q.text}`;
+    answersListEl.innerHTML = '';
+    q.choices.forEach((choice, idx) => {
+      const btn = document.createElement('button');
+      btn.textContent = `${String.fromCharCode(65 + idx)}. ${choice}`;
+      btn.dataset.idx = idx;
+      btn.addEventListener('click', () => {
+        clearInterval(timerInterval);
+        handleAnswer(idx);
+      });
+      answersListEl.appendChild(btn);
+    });
+  }
+
+  // Handle answer logic
+  function handleAnswer(selectedIdx) {
+    const q = QUESTIONS[currentQuestionIndex];
+    const answerButtons = [...answersListEl.children];
+
+    // Highlight correct/incorrect answers
+    answerButtons.forEach(btn => {
+      const btnIdx = parseInt(btn.dataset.idx);
+      btn.disabled = true;
+      if(btnIdx === q.correct) btn.classList.add('correct');
+      if(selectedIdx !== null && btnIdx === selectedIdx && btnIdx !== q.correct) btn.classList.add('wrong');
+    });
+
+    let correct = selectedIdx === q.correct;
+
+    // Play sound
+    if(correct) {
+      correctSound.currentTime = 0;
+      correctSound.play();
+    } else {
+      wrongSound.currentTime = 0;
+      wrongSound.play();
+    }
+
+    // Show explanation after 2 seconds, then next question
+    setTimeout(() => {
+      alert(`Explanation:\n${q.explanation}`);
+      processAnswer(correct);
+    }, 1100);
+  }
+
+  // Process answer result (correct or wrong)
+  function processAnswer(correct) {
+    if(correct) {
+      correctCount++;
+      consecutiveCorrect++;
+      // Move car
+      moveCar(true);
+
+      // Nitro boost on 3 consecutive correct
+      if(consecutiveCorrect > 0 && consecutiveCorrect % 3 === 0) {
+        nitroAvailable = true;
+        alert('NITRO BOOST! Your car moves extra forward!');
+        moveCar(true, true);
+      }
+
+    } else {
+      wrongCount++;
+      consecutiveCorrect = 0;
+      moveCar(false);
+    }
+
+    updateProgressBar();
+
+    currentQuestionIndex++;
+    resetTimer();
+
+    if(currentQuestionIndex < QUESTIONS.length) {
+      showQuestion();
+    } else {
+      clearInterval(timerInterval);
+      endGame();
+    }
+  }
+
+  // Move car animation
+  // If nitro true, move extra distance
+  function moveCar(correct, nitro = false) {
+    const baseMove = 30; // pixels per correct answer
+    const nitroMove = 60; // pixels for nitro boost
+    const currentLeft = parseInt(playerCarEl.style.left) || 0;
+
+    let moveBy = 0;
+    if(correct) {
+      moveBy = nitro ? nitroMove : baseMove;
+    } else {
+      moveBy = 0;
+    }
+    let newLeft = currentLeft + moveBy;
+    if(newLeft > raceDistance) newLeft = raceDistance;
+    playerCarEl.style.left = newLeft + 'px';
+
+    // Checkpoint example at half track
+    if(currentLeft < raceDistance / 2 && newLeft >= raceDistance / 2) {
+      alert('Checkpoint reached! Keep going!');
+    }
+
+    // Nitro visual effect
+    if(nitro) {
+      playerCarEl.style.boxShadow = '0 0 20px 6px #ff0';
+      setTimeout(() => playerCarEl.style.boxShadow = '', 700);
+    }
+  }
+
+  // Update progress bar
+  function updateProgressBar() {
+    const percent = ((currentQuestionIndex) / QUESTIONS.length) * 100;
+    progressBarContainer.style.width = percent + '%';
+  }
+
+  // End game show result
+  function endGame() {
+    gameStarted = false;
+    gameArea.classList.add('hidden');
+
+    const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+
+    // Calculate score, simplistic formula
+    const score = correctCount * 10 + (consecutiveCorrect >= 3 ? 20 : 0)
+      + (timeTaken < QUESTIONS.length * 30 ? 10 : 0);
+
+    // Determine medal
+    let medal = 'Bronze';
+    if(score > (QUESTIONS.length * 10 * 0.9)) medal = 'Gold';
+    else if(score > (QUESTIONS.length * 10 * 0.7)) medal = 'Silver';
+
+    // Position in race (simplified)
+    const position = score > QUESTIONS.length * 10 * 0.8 ? 1 : 2;
+
+    // Motivational messages
+    const messages = [
+      "Keep practicing and you'll be the champion!",
+      "Good effort. Review and try again!",
+      "Well done! You're improving!",
+      "Excellent performance! Keep it up!"
+    ];
+    const motivMsg = messages[Math.floor(Math.random() * messages.length)];
+
+    resultPanel.innerHTML =
+      `<h2>CONGRATULATIONS, ${player.name.toUpperCase()}!</h2>
+      <p>Class: <strong>${player.class}</strong></p>
+      <p>Total Questions: <strong>${QUESTIONS.length}</strong></p>
+      <p>Correct Answers: <strong>${correctCount}</strong></p>
+      <p>Wrong Answers: <strong>${wrongCount}</strong></p>
+      <p>Final Score: <strong>${score}</strong></p>
+      <p>Time Taken: <strong>${timeTaken} seconds</strong></p>
+      <p>Race Position: <strong>${position}${position===1?'st':position===2?'nd':'th'}</strong></p>
+      <p><strong>Medal Earned: ${medal}</strong></p>
+      <p style="margin-top: 1em; font-weight: 700;">${motivMsg}</p>
+      <button id="btn-restart" style="margin-top: 25px;">Play Again</button>`;
+
+    resultPanel.classList.remove('hidden');
+
+    // Restart button
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      resultPanel.classList.add('hidden');
+      init();
+    });
+  }
+
+  // Kick off
+  init();
+
+  // Exposed for future teacher mode or extension
+  window.PTRacing = {
+    QUESTIONS,
+    restart: init
+  };
+})();
+</script>
+
+</body>
+</html>
+
